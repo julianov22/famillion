@@ -112,7 +112,7 @@ function onSubmit(fn, emptyMsg) {
     if (msg) err.textContent = msg;
   };
   ok.onclick = go;
-  input.onkeydown = e => e.key === 'Enter' && go();
+  input.onkeydown = e => { if (e.key === 'Enter') go(); }; // must not return false: that cancels every keypress
 }
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
