@@ -1,6 +1,11 @@
 // Run with: node test.mjs
 import assert from 'node:assert/strict';
-import { norm, dayKey, dayNumber, pickPrompts, score } from './game.js';
+import { norm, dayKey, dayNumber, pickPrompts, promptText, score } from './game.js';
+
+assert.equal(promptText('Name a tapa | Di una tapa', 'es'), 'Di una tapa');
+assert.equal(promptText('Name a tapa | Di una tapa', 'en'), 'Name a tapa');
+assert.equal(promptText('Name a tapa', 'es'), 'Name a tapa');
+assert.equal(pickPrompts(Array.from({ length: 14 }, (_, i) => i), dayNumber('2026-12-20', '2026-12-19'))[0], 7); // practice day 0 wraps to the last set
 
 assert.equal(norm('  The Cancún! '), 'cancun');
 assert.equal(norm('A tire'), 'tire');

@@ -1,28 +1,194 @@
-# One prompt per line. Day 1 uses the first 7, day 2 the next 7, and so on.
+# One prompt per line, written as: English | Español
+# Day 1 (December 20) uses the first 7 prompts, day 2 the next 7, and so on.
 # Add new prompts at the bottom only: inserting lines above shifts every day's set.
-# When the list runs out, it starts over from the top.
+# When the list runs out, it starts over from the top. Days before December 20 are practice rounds.
 # Lines starting with # are ignored.
 
-Name a place the family has been on holiday
-Name something Dad always says
-Name a word that rhymes with "Famillion"
-Name a dish someone in the family is famous for
-Name a movie we've watched together more than once
-Name a nickname someone in the family has had
-Name something that broke on a family trip
+# Day 1 · Sun 20 Dec · Flumserberg with the Bosmans
+Name a Swiss ski resort | Di una estación de esquí suiza
+Name something you always forget to pack for a ski trip | Di algo que siempre se te olvida meter en la maleta de esquí
+Name a dish with melted cheese | Di un plato con queso fundido
+Name a word that rhymes with "Anouk" | Di una palabra que rime con "Anouk"
+Name a Lego theme or set | Di una temática o un set de Lego
+Name a city Julián and Anouk have visited together | Di una ciudad que Julián y Anouk hayan visitado juntos
+Name something Paul is competitive about | Di algo en lo que Paul es competitivo
 
-Name something Mom always says
-Name a pet the family (or a relative) has had
-Name a song that gets played at every family party
-Name a city where someone in the family has lived
-Name a food someone in the family refuses to eat
-Name a board or card game the family plays
-Name a car someone in the family has owned
+# Day 2 · Mon 21 Dec
+Name something that can go wrong on the slopes | Di algo que puede salir mal en las pistas
+Name a Swiss lake | Di un lago suizo
+Name a word that rhymes with "Bosman" | Di una palabra que rime con "Bosman"
+Name something typical of Rotterdam | Di algo típico de Róterdam
+Name a gift you'd find under the Bosman Christmas tree | Di un regalo que encontrarías bajo el árbol de Navidad de los Bosman
+Name a sport the Bosmans love | Di un deporte que les encanta a los Bosman
+Name a Christmas song | Di una canción de Navidad
 
-Name a wedding, party, or celebration the family went to
-Name a sport someone in the family has played
-Name a gift nobody in the family has forgotten
-Name a TV show the family watched together
-Name a restaurant the family has eaten at together
-Name a job someone in the family has had
-Name something that always happens at Christmas dinner
+# Day 3 · Tue 22 Dec
+Name a winter sport | Di un deporte de invierno
+Name something typical of Limburg | Di algo típico de Limburgo
+Name a word that rhymes with "Kevin" | Di una palabra que rime con "Kevin"
+Name a good name for a guinea pig | Di un buen nombre para una cobaya
+Name a famous racing driver | Di un piloto de carreras famoso
+Name something you'd find in a mountain hut | Di algo que encontrarías en un refugio de montaña
+Name something Swedish | Di algo sueco
+
+# Day 4 · Wed 23 Dec
+Name a Swiss city | Di una ciudad suiza
+Name a reason to stop skiing early | Di un motivo para dejar de esquiar antes de tiempo
+Name a word that rhymes with "Marianne" | Di una palabra que rime con "Marianne"
+Name a dish two people could cook for the whole family | Di un plato que dos personas podrían cocinar para toda la familia
+Name something you could build with Lego | Di algo que podrías construir con Lego
+Name a Dutch snack | Di un snack neerlandés
+Name something Anouk is competitive about | Di algo en lo que Anouk es competitiva
+
+# Day 5 · Thu 24 Dec · Christmas, according to Marianne
+Name a reason Christmas belongs on the 24th | Di un motivo por el que la Navidad es el día 24
+Name a Christmas dish | Di un plato de Navidad
+Name a dessert | Di un postre
+Name a word that rhymes with "Paul" | Di una palabra que rime con "Paul"
+Name a Christmas movie | Di una película de Navidad
+Name something you'd dip in fondue | Di algo que mojarías en la fondue
+Name a reindeer, elf, or other Christmas character | Di un reno, un elfo u otro personaje navideño
+
+# Day 6 · Fri 25 Dec · Christmas, according to Paul's family
+Name a reason Christmas belongs on the 25th | Di un motivo por el que la Navidad es el día 25
+Name a gift nobody needs | Di un regalo que nadie necesita
+Name a word that rhymes with "Yael" | Di una palabra que rime con "Yael"
+Name a famous skier or snowboarder | Di un esquiador o snowboarder famoso
+Name a Christmas sweet | Di un dulce de Navidad
+Name a Christmas tradition in the Netherlands | Di una tradición navideña de los Países Bajos
+Name something that's better in winter | Di algo que es mejor en invierno
+
+# Day 7 · Sat 26 Dec · Last ski day
+Name a Swiss mountain | Di una montaña suiza
+Name something people lose on a ski trip | Di algo que se pierde en un viaje de esquí
+Name a word that rhymes with "snow" | Di una palabra que rime con "nieve"
+Name something Swiss that isn't chocolate or cheese | Di algo suizo que no sea chocolate ni queso
+Name a card or board game | Di un juego de cartas o de mesa
+Name a place in the Spanish mountains to get married | Di un lugar de las montañas de España para casarse
+Name the best moment of this ski trip | Di el mejor momento de este viaje de esquí
+
+# Day 8 · Sun 27 Dec · Between trips, anyone can play from home
+Name a European capital | Di una capital europea
+Name something Julián is good at | Di algo que se le da bien a Julián
+Name a word that rhymes with "cheese" | Di una palabra que rime con "queso"
+Name something you'd find in Amsterdam | Di algo que encontrarías en Ámsterdam
+Name a breakfast food | Di algo que se desayuna
+Name a toy from the 90s | Di un juguete de los años 90
+Name something to do on a rainy day | Di algo que hacer en un día de lluvia
+
+# Day 9 · Mon 28 Dec
+Name something Anouk is good at | Di algo que se le da bien a Anouk
+Name a city in Sweden | Di una ciudad de Suecia
+Name a word that rhymes with "Lego" | Di una palabra que rime con "Lego"
+Name a famous painting | Di un cuadro famoso
+Name a kind of bread | Di un tipo de pan
+Name something you'd take to a desert island | Di algo que te llevarías a una isla desierta
+Name a famous couple | Di una pareja famosa
+
+# Day 10 · Tue 29 Dec
+Name a honeymoon destination | Di un destino de luna de miel
+Name a wedding tradition | Di una tradición de boda
+Name a song for a first dance | Di una canción para el primer baile
+Name a word that rhymes with "wedding" | Di una palabra que rime con "boda"
+Name something you'd find at a train station | Di algo que encontrarías en una estación de tren
+Name something people do at airports | Di algo que la gente hace en los aeropuertos
+Name an ice cream flavour | Di un sabor de helado
+
+# Day 11 · Wed 30 Dec · Madrid con la familia
+Name a place in Madrid | Di un lugar de Madrid
+Name a tapa | Di una tapa
+Name a word that rhymes with "Rosa" | Di una palabra que rime con "Rosa"
+Name a Real Madrid player, past or present | Di un jugador del Real Madrid, actual o de siempre
+Name a famous Spaniard | Di un español famoso o una española famosa
+Name something Dutch people do that surprises Spanish people | Di algo que hacen los neerlandeses que sorprende a los españoles
+Name a gift or activity you could hide in the little red tree of drawers | Di un regalo o una actividad que podrías esconder en el arbolito rojo de cajones
+
+# Day 12 · Thu 31 Dec · Nochevieja
+Name something that happens at midnight on New Year's Eve | Di algo que pasa a medianoche en Nochevieja
+Name something that can go wrong with the 12 grapes | Di algo que puede salir mal con las doce uvas
+Name a word that rhymes with "grape" | Di una palabra que rime con "uva"
+Name a drink for a toast | Di una bebida para brindar
+Name a New Year's resolution | Di un propósito de Año Nuevo
+Name a song from this year | Di una canción de este año
+Name a big event from 2026 | Di un acontecimiento importante de 2026
+
+# Day 13 · Fri 1 Jan · Año Nuevo
+Name a hangover cure | Di un remedio para la resaca
+Name something Julián and Anouk will do in 2027 | Di algo que harán Julián y Anouk en 2027
+Name a word that rhymes with "Julián" | Di una palabra que rime con "Julián"
+Name a Spanish singer or band | Di un cantante o un grupo español
+Name something to do on a lazy day | Di algo que hacer en un día de no hacer nada
+Name a famous tennis player | Di un tenista famoso o una tenista famosa
+Name a typical Madrid dish | Di un plato típico de Madrid
+
+# Day 14 · Sat 2 Jan
+Name a good name for a turtle | Di un buen nombre para una tortuga
+Name a bird people keep as a pet | Di un pájaro que la gente tiene de mascota
+Name a word that rhymes with "Madrid" | Di una palabra que rime con "Madrid"
+Name a museum in Madrid | Di un museo de Madrid
+Name something Spanish people do that surprises Dutch people | Di algo que hacen los españoles que sorprende a los neerlandeses
+Name a basketball player | Di un jugador de baloncesto
+Name a Spanish word Anouk uses | Di una palabra en español que usa Anouk
+
+# Day 15 · Sun 3 Jan
+Name a Spanish city | Di una ciudad española
+Name a mountain range in Spain | Di una sierra o cordillera de España
+Name a word that rhymes with "fiesta" | Di una palabra que rime con "fiesta"
+Name a Dutch word Julián uses | Di una palabra en neerlandés que usa Julián
+Name a Spanish Christmas sweet | Di un dulce navideño español
+Name something you'd buy at a Spanish market | Di algo que comprarías en un mercado español
+Name a Spanish film or director | Di una película o un director español
+
+# Day 16 · Mon 4 Jan
+Name something to do in Madrid in winter | Di algo que hacer en Madrid en invierno
+Name a sport the family watches on TV | Di un deporte que la familia ve en la tele
+Name a word that rhymes with "turtle" | Di una palabra que rime con "tortuga"
+Name a Spanish TV show | Di un programa o una serie de la tele española
+Name something Rosa always says | Di algo que siempre dice Rosa
+Name something Julián padre always says | Di algo que siempre dice Julián padre
+Name a dish Rosa cooks | Di un plato que cocina Rosa
+
+# Day 17 · Tue 5 Jan · Cabalgata de Reyes
+Name something that happens at the Three Kings parade | Di algo que pasa en la cabalgata de Reyes
+Name a gift you'd ask the Three Kings for | Di un regalo que les pedirías a los Reyes Magos
+Name a word that rhymes with "king" | Di una palabra que rime con "rey"
+Name something you leave out for the Three Kings | Di algo que se les deja a los Reyes Magos
+Name a childhood memory of Julián | Di un recuerdo de Julián de pequeño
+Name a Madrid neighbourhood | Di un barrio de Madrid
+Name a sweet you'd find in a Madrid bakery | Di un dulce que encontrarías en una pastelería de Madrid
+
+# Day 18 · Wed 6 Jan · Reyes
+Name something you might find in a roscón | Di algo que podrías encontrar en un roscón
+Name a Spanish word every tourist knows | Di una palabra en español que todo turista conoce
+Name a word that rhymes with "family" | Di una palabra que rime con "familia"
+Name the best moment of these holidays | Di el mejor momento de estas vacaciones
+Name something both families have in common | Di algo que tienen en común las dos familias
+Name a place Julián and Anouk should travel to next | Di un sitio al que deberían viajar Julián y Anouk
+Name who will dance the most at the wedding | Di quién bailará más en la boda
+
+# Day 19 · Thu 7 Jan · Back home, everyone can play
+Name a famous Dutch person | Di un neerlandés famoso o una neerlandesa famosa
+Name a vegetable people hate | Di una verdura que la gente odia
+Name a word that rhymes with "ski" | Di una palabra que rime con "esquí"
+Name a TV series | Di una serie
+Name a job you'd be terrible at | Di un trabajo que se te daría fatal
+Name a kitchen gadget | Di un aparato de cocina
+Name something you do every Monday | Di algo que haces todos los lunes
+
+# Day 20 · Fri 8 Jan
+Name a country you've never been to | Di un país en el que nunca has estado
+Name a cartoon character | Di un personaje de dibujos animados
+Name a word that rhymes with "cake" | Di una palabra que rime con "tarta"
+Name something in the supermarket that costs too much | Di algo del supermercado que cuesta demasiado
+Name an app on your phone | Di una app de tu móvil
+Name a famous duo | Di un dúo famoso
+Name a smell everyone loves | Di un olor que le gusta a todo el mundo
+
+# Day 21 · Sat 9 Jan
+Name a superhero | Di un superhéroe
+Name an excuse for being late | Di una excusa para llegar tarde
+Name a word that rhymes with "summer" | Di una palabra que rime con "verano"
+Name something you'd find in a garage | Di algo que encontrarías en un garaje
+Name a famous bridge | Di un puente famoso
+Name something orange | Di algo naranja
+Name a summer holiday activity | Di algo que hacer en las vacaciones de verano

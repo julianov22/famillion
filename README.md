@@ -6,7 +6,7 @@ A daily game of 7 prompts about your family and friends. One play per day. The f
 - Two people said it: 2 points
 - Three or more: 1 point
 
-Small differences don't matter: "The Cancún!" and "cancun" count as the same answer.
+Small differences don't matter: "The Cancún!" and "cancun" count as the same answer. Translations do: "skiing" and "esquiar" count as different answers.
 
 ## How it's built
 
@@ -26,8 +26,8 @@ Players join by typing their name. There are no passwords or emails: Supabase gi
    - `SUPABASE_KEY`: the publishable key from **Project Settings → API Keys**. It starts with `sb_publishable_`. The legacy `anon` key also works. Never use the secret key.
 
    The publishable key is meant to be public; the database rules in `schema.sql` protect the data. The green **Connect** button at the top of the dashboard shows both values too.
-4. **Set the start date and timezone.** In `index.html`, `START` is day 1 and `TZ` is the family's timezone. If you change `TZ`, change it in `family_today()` in `schema.sql` too.
-5. **Write your prompts** in `prompts.txt`, one per line. Add new ones at the bottom only.
+4. **Set the start date and timezone.** In `index.html`, `START` is day 1 and `TZ` is the family's timezone. Days before `START` are practice rounds, for testing. If you change `TZ`, change it in `family_today()` in `schema.sql` too.
+5. **Write your prompts** in `prompts.txt`, one per line, as `English | Español`. Players switch languages at the top of the page. Add new prompts at the bottom only.
 6. **Publish it.** On GitHub go to **Settings → Pages**, choose **Deploy from a branch**, then `main` and `/ (root)`. The game goes live at `https://julianov22.github.io/famillion/`. Send that link to the family.
 
 ## Being the referee
