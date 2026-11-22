@@ -34,7 +34,8 @@ summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:n
 <main id="app"><div class="card"><p class="muted">Loading…</p></div></main>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
-import { norm, points, dayKey, dayNumber, pickPrompts, promptText, score } from './game.js';
+// ponytail: skips the browser cache on every load so the page and game.js never mismatch after a deploy; game.js is tiny.
+const { norm, points, dayKey, dayNumber, pickPrompts, promptText, score } = await import(`./game.js?v=${Date.now()}`);
 
 // Settings. The key is Supabase's public anon/publishable key, safe to expose (RLS protects the data).
 const SUPABASE_URL = 'https://skbzynccpjjltrweyjcr.supabase.co';
@@ -123,7 +124,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 const today = dayKey(TZ);
 const yesterday = dayKey(TZ, new Date(Date.now() - 864e5));
 const n = dayNumber(START, today);
-const lines = (await (await fetch('prompts.txt')).text()).split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
+const lines = (await (await fetch('prompts.txt', { cache: 'no-cache' })).text()).split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
 if (lines.length < 7) { fail('prompts.txt needs at least 7 prompts.'); throw new Error('Not enough prompts'); }
 const todays = pickPrompts(lines, n);
 const startDate = () => new Date(`${START}T12:00:00Z`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
