@@ -1,0 +1,28 @@
+# One prompt per line. Day 1 uses the first 7, day 2 the next 7, and so on.
+# Add new prompts at the bottom only: inserting lines above shifts every day's set.
+# When the list runs out, it starts over from the top.
+# Lines starting with # are ignored.
+
+Name a place the family has been on holiday
+Name something Dad always says
+Name a word that rhymes with "Famillion"
+Name a dish someone in the family is famous for
+Name a movie we've watched together more than once
+Name a nickname someone in the family has had
+Name something that broke on a family trip
+
+Name something Mom always says
+Name a pet the family (or a relative) has had
+Name a song that gets played at every family party
+Name a city where someone in the family has lived
+Name a food someone in the family refuses to eat
+Name a board or card game the family plays
+Name a car someone in the family has owned
+
+Name a wedding, party, or celebration the family went to
+Name a sport someone in the family has played
+Name a gift nobody in the family has forgotten
+Name a TV show the family watched together
+Name a restaurant the family has eaten at together
+Name a job someone in the family has had
+Name something that always happens at Christmas dinner

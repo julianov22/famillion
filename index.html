@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Famillion</title>
+<style>
+:root{--bg:#faf9f6;--card:#fff;--text:#1f1e1b;--muted:#6b6a65;--border:#e3e1da;--accent:#2457c5;--on-accent:#fff;--accent-bg:#e6effd;--danger:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#161614;--card:#201f1c;--text:#ecebe6;--muted:#a09f99;--border:#38372f;--accent:#8fb3ff;--on-accent:#0b1530;--accent-bg:#1e2a44;--danger:#ff8a7a}}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,sans-serif}
+main{max-width:560px;margin:0 auto;padding:24px 16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px}
+h1{font-size:24px;margin:0 0 8px}h2{font-size:19px;margin:0 0 16px}
+p{margin:0 0 16px}.muted{color:var(--muted);font-size:14px;margin:0 0 4px}
+input{width:100%;box-sizing:border-box;font:inherit;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)}
+button{font:inherit;padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer}
+button.ghost{background:none;color:var(--accent);border-color:var(--border)}
+button:disabled{opacity:.6}
+.err{color:var(--danger);font-size:14px;min-height:20px;margin:6px 0}
+.dots{display:flex;gap:6px;margin-bottom:16px}.dots i{flex:1;height:4px;border-radius:2px;background:var(--border)}.dots i.on{background:var(--accent)}
+.row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:15px}
+.row .label{flex:1;min-width:0;overflow-wrap:anywhere}
+.bar{width:80px;height:8px;border-radius:4px;background:var(--border);overflow:hidden;flex-shrink:0}.bar i{display:block;height:100%;background:var(--muted)}
+.mine{font-weight:600}.mine .bar i{background:var(--accent)}
+.pts{font-size:13px;color:var(--muted);white-space:nowrap;min-width:72px;text-align:right}
+.tag{background:var(--accent-bg);color:var(--accent);font-size:12px;padding:1px 8px;border-radius:6px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.stats .card{margin:0}.stats b{display:block;font-size:26px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:none}details .muted{margin:0 0 6px}
+</style>
+</head>
+<body>
+<main id="app"><div class="card"><p class="muted">Loading…</p></div></main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
+import { norm, points, dayKey, dayNumber, pickPrompts, score } from './game.js';
+
+// Settings. The key is Supabase's public anon/publishable key, safe to expose (RLS protects the data).
+const SUPABASE_URL = 'https://skbzynccpjjltrweyjcr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_TC2DTPoGru0qaKWiqyyNkw_7X0HXQTh';
+const START = '2026-11-23';     // Day 1
+const TZ = 'Europe/Amsterdam';  // Keep in sync with family_today() in schema.sql
+
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+const show = html => { app.innerHTML = html; scrollTo(0, 0); };
+const card = html => `<div class="card">${html}</div>`;
+const fail = msg => show(card(`<h2>Something went wrong</h2><p>${esc(msg)}</p><button onclick="location.reload()">Reload</button>`));
+
+// Wires the #in input and #ok button. fn returns an error message to show, or nothing.
+function onSubmit(fn, emptyMsg) {
+  const input = document.getElementById('in'), ok = document.getElementById('ok'), err = document.getElementById('err');
+  input.focus();
+  input.oninput = () => (err.textContent = '');
+  const go = async () => {
+    const v = input.value.trim();
+    if (!norm(v)) return (err.textContent = emptyMsg);
+    ok.disabled = true;
+    const msg = await fn(v);
+    ok.disabled = false;
+    if (msg) err.textContent = msg;
+  };
+  ok.onclick = go;
+  input.onkeydown = e => e.key === 'Enter' && go();
+}
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  show(card('<h1>Almost there</h1><p>Add your Supabase URL and key at the top of <code>index.html</code>. The README has the steps.</p>'));
+  throw new Error('Supabase is not configured');
+}
+
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const today = dayKey(TZ);
+const yesterday = dayKey(TZ, new Date(Date.now() - 864e5));
+const n = dayNumber(START, today);
+const lines = (await (await fetch('prompts.txt')).text()).split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
+if (lines.length < 7) { fail('prompts.txt needs at least 7 prompts.'); throw new Error('Not enough prompts'); }
+const todays = pickPrompts(lines, n);
+let me = null; // { id, name }
+
+async function home() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const { data } = await sb.from('players').select('id, name').eq('id', session.user.id).maybeSingle();
+    me = data;
+  }
+  if (!me) return askName();
+  const { count, error } = await sb.from('answers').select('*', { count: 'exact', head: true }).eq('day', today).eq('player_id', me.id);
+  if (error) return fail(error.message);
+  if (count >= 7) return results(today);
+  show(card(`<p class="muted">Day ${n}</p><h1>Today's 7 prompts</h1>
+    <p>Hi ${esc(me.name)}. Give one answer per prompt. The fewer people who say the same thing, the more points you get. You can play once a day.</p>
+    <div class="actions"><button id="go">Start</button><button class="ghost" id="yday">Yesterday's results</button></div>`));
+  document.getElementById('go').onclick = () => ask();
+  document.getElementById('yday').onclick = () => results(yesterday);
+}
+
+function askName() {
+  show(card(`<h1>Famillion</h1><p>A daily game of 7 prompts about the family. Rarer answers score more.</p>
+    <p class="muted">What does the family call you?</p>
+    <input id="in" maxlength="30" placeholder="Tía Rosa" autocomplete="off"><p class="err" id="err"></p><button id="ok">Join</button>`));
+  onSubmit(async name => {
+    if (!(await sb.auth.getSession()).data.session) {
+      const { error } = await sb.auth.signInAnonymously();
+      if (error) return error.message;
+    }
+    const { error } = await sb.from('players').insert({ name });
+    if (error) return error.code === '23505' ? 'Someone already uses that name. Try another.' : error.message;
+    home();
+  }, 'Enter your name first');
+}
+
+function ask(i = 0, answers = []) {
+  show(card(`<div class="dots">${todays.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+    <p class="muted">Prompt ${i + 1} of 7</p><h2>${esc(todays[i])}</h2>
+    <input id="in" maxlength="100" placeholder="Your answer" autocomplete="off"><p class="err" id="err"></p>
+    <button id="ok">${i < 6 ? 'Next' : 'Finish'}</button>`));
+  onSubmit(async answer => {
+    answers[i] = answer;
+    if (i < 6) return ask(i + 1, answers);
+    const { error } = await sb.from('answers').insert(answers.map((answer, idx) => ({ day: today, idx, prompt: todays[idx], answer })));
+    if (error?.code === '42501') return 'A new day just started. Reload the page to get the new prompts.';
+    if (error && error.code !== '23505') return error.message; // 23505 = already played, show results
+    results(today);
+  }, 'Enter an answer first');
+}
+
+async function results(day) {
+  const { data, error } = await sb.from('answers').select('idx, prompt, answer, players(name)').eq('day', day);
+  if (error) return fail(error.message);
+  const isToday = day === today;
+  const label = isToday ? 'Today' : day === yesterday ? 'Yesterday' : day;
+  const nav = `<div class="actions">${isToday ? '<button class="ghost" id="refresh">Refresh</button><button class="ghost" id="yday">Yesterday\'s results</button>' : '<button class="ghost" id="back">Back</button>'}</div>`;
+  if (!data.length) {
+    show(card(`<h2>${label}</h2><p>Nobody played that day.</p>${nav}`));
+  } else {
+    const { prompts, totals } = score(data.map(r => ({ ...r, name: r.players.name })));
+    const board = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+    const players = board.length;
+    const mine = me && totals[me.name] !== undefined;
+    const rank = mine ? board.filter(([, s]) => s > totals[me.name]).length + 1 : null;
+    show(`${mine ? `<div class="stats"><div class="card"><p class="muted">Your score</p><b>${totals[me.name]} / 21</b></div>
+      <div class="card"><p class="muted">Your rank</p><b>#${rank} of ${players}</b></div></div>` : ''}
+      <div class="card"><p class="muted">${label} · ${players} played${isToday ? ' so far · scores change as more people play' : ''}</p>
+      ${board.map(([name, s], k) => `<div class="row ${me?.name === name ? 'mine' : ''}"><span style="width:20px" class="muted">${k + 1}</span><span class="label">${esc(name)}</span><span class="pts">${s} pts</span></div>`).join('')}
+      </div>
+      ${prompts.map((p, k) => p && card(`<p class="muted">${k + 1}. ${esc(p.text)}</p>${p.groups.map(g => {
+        const isMine = me && g.who.includes(me.name);
+        return `<details><summary class="row ${isMine ? 'mine' : ''}"><span class="label">${esc(g.label)}</span>${isMine ? '<span class="tag">You</span>' : ''}
+          <span class="bar"><i style="width:${Math.round(g.who.length / players * 100)}%"></i></span><span class="pts">${g.who.length}× · ${points(g.who.length)} pts</span></summary>
+          <p class="muted">${esc(g.who.join(', '))}</p></details>`;
+      }).join('')}`)).join('')}
+      ${card(`<p class="muted">Only you said it = 3 points · two people = 2 · three or more = 1. Tap an answer to see who said it.</p>${nav}`)}`);
+  }
+  document.getElementById('refresh')?.addEventListener('click', () => results(today));
+  document.getElementById('yday')?.addEventListener('click', () => results(yesterday));
+  document.getElementById('back')?.addEventListener('click', home);
+}
+
+home().catch(e => fail(e.message));
+</script>
+</body>
+</html>
