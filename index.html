@@ -2,106 +2,249 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Famillion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#faf9f6;--card:#fff;--text:#1f1e1b;--muted:#6b6a65;--border:#e3e1da;--accent:#2457c5;--on-accent:#fff;--accent-bg:#e6effd;--danger:#b3261e}
-@media (prefers-color-scheme:dark){:root{--bg:#161614;--card:#201f1c;--text:#ecebe6;--muted:#a09f99;--border:#38372f;--accent:#8fb3ff;--on-accent:#0b1530;--accent-bg:#1e2a44;--danger:#ff8a7a}}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,sans-serif}
-main{max-width:560px;margin:0 auto;padding:16px 16px 24px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px}
-h1{font-size:24px;margin:0 0 8px}h2{font-size:19px;margin:0 0 16px}
-p{margin:0 0 16px}.muted{color:var(--muted);font-size:14px;margin:0 0 4px}
-input{width:100%;box-sizing:border-box;font:inherit;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)}
-button{font:inherit;padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer}
-button.ghost{background:none;color:var(--accent);border-color:var(--border)}
-button:disabled{opacity:.6}
-.err{color:var(--danger);font-size:14px;min-height:20px;margin:6px 0}
-.dots{display:flex;gap:6px;margin-bottom:16px}.dots i{flex:1;height:4px;border-radius:2px;background:var(--border)}.dots i.on{background:var(--accent)}
-.row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:15px}
-.row .label{flex:1;min-width:0;overflow-wrap:anywhere}
-.bar{width:80px;height:8px;border-radius:4px;background:var(--border);overflow:hidden;flex-shrink:0}.bar i{display:block;height:100%;background:var(--muted)}
-.mine{font-weight:600}.mine .bar i{background:var(--accent)}
-.pts{font-size:13px;color:var(--muted);white-space:nowrap;min-width:72px;text-align:right}
-.tag{background:var(--accent-bg);color:var(--accent);font-size:12px;padding:1px 8px;border-radius:6px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.stats .card{margin:0}.stats b{display:block;font-size:26px}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.lang{display:flex;justify-content:flex-end;gap:6px;margin-bottom:12px}.lang button{padding:4px 12px;font-size:13px}.lang button[aria-pressed=true]{background:var(--accent-bg)}
-summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:none}details .muted{margin:0 0 6px}
+:root{--red:#d52b1e;--ink:#14213d;--snow:#f7fafc;--ice:#dbe7f2;--lake:#2b7a8c;--muted:#5b6b82;--celeste:#38b6e8}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0f1d33;font-family:Inter,system-ui,sans-serif;color:var(--ink)}
+.stage{position:relative;height:100dvh;max-width:480px;margin:0 auto;overflow:hidden;overflow:clip;background:#7fb3e0} /* clip: focusing an input can't scroll the stage */
+#world{position:absolute;left:0;top:0;width:100%;will-change:transform}
+#world svg{display:block;width:100%;height:auto}
+.tint{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity 1.4s}
+#snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.top{position:absolute;top:0;left:0;right:0;padding:12px;display:flex;align-items:center;gap:8px;z-index:5}
+.pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:6px 10px;border-radius:999px}
+.brand{font:800 16px 'Bricolage Grotesque';letter-spacing:-.02em;color:var(--ink)}
+.flags{display:flex;gap:5px}
+.flags i{width:9px;height:12px;clip-path:polygon(0 0,100% 30%,0 60%);background:rgba(20,33,61,.2)}
+.flags.round i{clip-path:none;width:9px;height:9px;border-radius:50%}
+.hud{margin-left:auto;font:700 13px 'JetBrains Mono';background:rgba(20,33,61,.82);border:1px solid rgba(255,255,255,.25);color:#fff;padding:7px 11px;border-radius:999px;white-space:nowrap}
+.lang{margin-left:auto;display:flex;gap:2px;background:rgba(255,255,255,.85);padding:3px;border-radius:999px}
+.lang button{font:600 12px Inter;border:0;background:none;color:var(--ink);padding:5px 10px;border-radius:999px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--ink);color:#fff}
+.top .brandpill,.top .hud{display:none}
+.top.run .brandpill,.top.run .hud{display:flex}
+.top.run .lang{display:none}
+.hero{position:absolute;top:10%;left:0;right:0;text-align:center;z-index:3;transition:opacity .6s,transform .8s}
+.hero.out{opacity:0;transform:translateY(-40px);pointer-events:none}
+.badge{position:relative;display:inline-grid;place-items:center;width:44px;height:44px;margin-bottom:14px}
+.badge.swiss{background:var(--red);border-radius:8px;box-shadow:0 6px 20px rgba(213,43,30,.35)}
+.badge.swiss::before,.badge.swiss::after{content:"";position:absolute;background:#fff;border-radius:1px}
+.badge.swiss::before{width:26px;height:8px}.badge.swiss::after{width:8px;height:26px}
+.badge.line{background:var(--celeste);border-radius:50%;color:#fff;font:800 24px 'Bricolage Grotesque';box-shadow:0 6px 20px rgba(56,182,232,.4)}
+.hero h1{font:800 64px/.9 'Bricolage Grotesque';color:#fff;margin:0;letter-spacing:-.045em;text-shadow:0 4px 30px rgba(20,33,61,.35)}
+.hero p{color:#fff;font:700 12px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;margin:14px 0 0;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+.card{position:absolute;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:4;background:rgba(255,255,255,.88);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-radius:22px;padding:18px;box-shadow:0 12px 40px rgba(15,29,51,.28);transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.card.out{transform:translateY(120%);opacity:0;pointer-events:none}
+.eyebrow{font:700 12px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.q{font:800 26px/1.12 'Bricolage Grotesque';letter-spacing:-.02em;margin:6px 0 12px}
+.lead{font-size:15px;line-height:1.5;color:var(--muted);margin:0 0 14px}
+input{width:100%;font:500 17px Inter;padding:14px;border-radius:14px;border:2px solid var(--ice);background:#fff;color:var(--ink);outline:none}
+input:focus{border-color:var(--ink)}
+.go{margin-top:10px;width:100%;font:600 17px Inter;padding:15px;border:0;border-radius:14px;background:var(--red);color:#fff;cursor:pointer}
+.go:active{transform:scale(.98)}.go:disabled{opacity:.6}
+.link{display:block;margin:10px auto 0;font:600 14px Inter;border:0;background:none;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.err{color:var(--red);font-size:13px;min-height:18px;margin-top:6px}
+.steps{display:flex;gap:6px;margin-bottom:12px}.steps i{width:22px;height:4px;border-radius:2px;background:var(--ice)}.steps i.on{background:var(--red)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:84dvh;overflow:auto;z-index:4;background:var(--snow);border-radius:24px 24px 0 0;padding:20px 16px 40px;box-shadow:0 -10px 40px rgba(15,29,51,.3);display:none}
+.sheet.in{display:block}.sheet.anim{animation:up .8s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(100%)}}
+.sheet h2{font:800 30px/1 'Bricolage Grotesque';letter-spacing:-.03em;margin:6px 0 4px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.stat{background:#fff;border:1px solid var(--ice);border-radius:16px;padding:12px 14px}
+.stat small{font:500 12px 'JetBrains Mono';color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat b{display:block;font:700 26px 'JetBrains Mono';margin-top:2px}
+.board{background:#101a2e;color:#e8f0ff;border-radius:16px;padding:6px 14px;font-family:'JetBrains Mono';margin-top:14px}
+.board .row{display:grid;grid-template-columns:20px 1fr auto 66px;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;align-items:center}
+.board .row:last-child{border:0}
+.board .me{color:#ffd166}.board .t{color:#7ee0a4}.board .pt{text-align:right;color:#9fb0cc}
+.board .r1{color:#f5c542}.board .r2{color:#c9d3e0}.board .r3{color:#d98c4a}
+.board .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub{font-size:13px;color:var(--muted);margin:8px 0 0}
+.sec{margin-top:22px}
+.sec .lab{font:700 11px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.sec h3{font:800 19px/1.2 'Bricolage Grotesque';margin:4px 0 10px;letter-spacing:-.01em}
+.tiles{display:grid;gap:8px}
+.tile{perspective:900px;height:56px}
+.tile .in{position:relative;height:100%;transition:transform .7s cubic-bezier(.3,1.4,.5,1);transform-style:preserve-3d}
+.tile.flip .in{transform:rotateX(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;padding:0 14px;gap:10px}
+.front{background:var(--ink);color:#fff;font:700 18px 'JetBrains Mono';justify-content:center;letter-spacing:.1em}
+.back{background:#fff;border:2px solid var(--ice);transform:rotateX(180deg)}
+.back.mine{border-color:var(--red);background:#fff5f4}
+.back .txt{flex:1;min-width:0}
+.back .a{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back .who{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back .p{font:700 15px 'JetBrains Mono';text-align:right;white-space:nowrap}
+.deep{font:700 10px 'JetBrains Mono';letter-spacing:.06em;color:#fff;background:var(--lake);padding:3px 7px;border-radius:6px;white-space:nowrap}
+.actions{display:flex;gap:8px;margin-top:24px}
+.ghost{flex:1;font:600 15px Inter;padding:12px;border-radius:12px;border:2px solid var(--ice);background:#fff;color:var(--ink);cursor:pointer}
 </style>
 </head>
 <body>
-<main id="app"><div class="card"><p class="muted">Loading…</p></div></main>
+<div class="stage" id="stage">
+  <div id="world"></div>
+  <div class="tint" id="tint"></div>
+  <canvas id="snow"></canvas>
+  <div class="top" id="top"><span class="pill brandpill"><span class="brand">Famillion</span><span class="flags" id="flags"></span></span><span class="lang" id="lang"></span><span class="hud" id="hud"></span></div>
+  <div class="hero out" id="hero"><span id="badge"></span><h1>Famillion</h1><p id="heroSub"></p></div>
+  <div class="card out" id="card"></div>
+  <div class="sheet" id="sheet"></div>
+</div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
-// ponytail: skips the browser cache on every load so the page and game.js never mismatch after a deploy; game.js is tiny.
+// ponytail: skips the browser cache on every load so the page and its modules never mismatch after a deploy; they're tiny.
 const { norm, points, dayKey, dayNumber, pickPrompts, promptText, score } = await import(`./game.js?v=${Date.now()}`);
+const { WORLDS } = await import(`./worlds.js?v=${Date.now()}`);
 
 // Settings. The key is Supabase's public anon/publishable key, safe to expose (RLS protects the data).
 const SUPABASE_URL = 'https://skbzynccpjjltrweyjcr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_TC2DTPoGru0qaKWiqyyNkw_7X0HXQTh';
 const START = '2026-12-20';     // Day 1. Days before it are practice rounds.
 const TZ = 'Europe/Amsterdam';  // Keep in sync with family_today() in schema.sql
+// Which world each day is played in. ?world=metro in the URL overrides it, for previewing.
+const DEFAULT_WORLD = 'alpine';
+const SCHEDULE = [{ from: '2026-12-30', to: '2027-01-06', world: 'metro' }];
 
 const T = {
   en: {
-    tagline: 'A daily game of 7 prompts about the family. Rarer answers score more.',
-    whoAreYou: 'First, your name. Everyone sees it on the leaderboard.', namePh: 'Your name', join: 'Join',
-    enterName: 'Enter your name first', nameTaken: 'Someone already uses that name. Try another.',
-    day: n => `Day ${n}`, practice: d => `Practice round · the game starts on ${d}`,
-    todayTitle: "Today's 7 prompts",
-    hi: name => `Hi ${name}. Give one answer per prompt. The fewer people who say the same thing, the more points you get. You can play once a day.`,
-    start: 'Start', yesterdayResults: "Yesterday's results",
-    promptOf: i => `Prompt ${i} of 7`, answerPh: 'Your answer', next: 'Next', finish: 'Finish',
-    enterAnswer: 'Enter an answer first', newDay: 'A new day just started. Reload the page to get the new prompts.',
+    intro: [
+      ['7 prompts a day', 'Every day there are 7 prompts about the family, like "Name a dish with melted cheese". Give one answer to each.'],
+      ['Rare answers win', 'Only you said it: 3 points. Two people: 2. Three or more: 1. Think of what only you would remember.'],
+      ['Then compare', 'You can play once a day. Afterwards you see everyone\'s answers and who said what.'],
+    ],
+    next: 'Next', letsGo: "Let's go",
+    whoAreYou: 'First, your name', nameLead: 'Everyone sees it on the leaderboard. Play from this phone every day.',
+    namePh: 'Your name', join: 'Join', enterName: 'Enter your name first', nameTaken: 'Someone already uses that name. Try another.',
+    day: n => `Day ${n}`, practice: 'Practice round', startsOn: d => `The game starts on ${d}.`,
+    hi: name => `Hi ${name}.`, yesterdayResults: "Yesterday's results",
+    answerPh: 'Your answer', enterAnswer: 'Enter an answer first',
+    newDay: 'A new day just started. Reload the page to get the new prompts.',
     today: 'Today', yesterday: 'Yesterday', nobody: 'Nobody played that day.', refresh: 'Refresh', back: 'Back',
-    yourScore: 'Your score', yourRank: 'Your rank', rankOf: (r, n) => `#${r} of ${n}`, you: 'You', pts: 'pts',
-    played: (n, live) => `${n} played${live ? ' so far · scores change as more people play' : ''}`,
-    rules: 'Only you said it = 3 points · two people = 2 · three or more = 1. Tap an answer to see who said it.',
-    oops: 'Something went wrong', reload: 'Reload',
+    rankPts: 'Rank · points', played: (n, live) => `${n} played${live ? ' so far · scores change as more people play' : ''}`,
+    deep: 'DEEP CUT', pts: 'pts', oops: 'Something went wrong', reload: 'Reload',
   },
   es: {
-    tagline: 'Un juego diario de 7 preguntas sobre la familia. Las respuestas más raras puntúan más.',
-    whoAreYou: 'Primero, tu nombre. Todos lo verán en la clasificación.', namePh: 'Tu nombre', join: 'Entrar',
-    enterName: 'Escribe tu nombre primero', nameTaken: 'Alguien ya usa ese nombre. Prueba otro.',
-    day: n => `Día ${n}`, practice: d => `Ronda de práctica · el juego empieza el ${d}`,
-    todayTitle: 'Las 7 preguntas de hoy',
-    hi: name => `Hola, ${name}. Da una respuesta por pregunta. Cuanta menos gente diga lo mismo, más puntos ganas. Puedes jugar una vez al día.`,
-    start: 'Empezar', yesterdayResults: 'Resultados de ayer',
-    promptOf: i => `Pregunta ${i} de 7`, answerPh: 'Tu respuesta', next: 'Siguiente', finish: 'Terminar',
-    enterAnswer: 'Escribe una respuesta primero', newDay: 'Acaba de empezar un nuevo día. Recarga la página para ver las preguntas nuevas.',
+    intro: [
+      ['7 preguntas al día', 'Cada día hay 7 preguntas sobre la familia, como "Di un plato con queso fundido". Da una respuesta a cada una.'],
+      ['Gana lo raro', 'Solo tú lo dijiste: 3 puntos. Dos personas: 2. Tres o más: 1. Piensa en lo que solo tú recordarías.'],
+      ['Y luego, a comparar', 'Puedes jugar una vez al día. Después ves las respuestas de todos y quién dijo qué.'],
+    ],
+    next: 'Siguiente', letsGo: '¡Vamos!',
+    whoAreYou: 'Primero, tu nombre', nameLead: 'Todos lo verán en la clasificación. Juega cada día desde este móvil.',
+    namePh: 'Tu nombre', join: 'Entrar', enterName: 'Escribe tu nombre primero', nameTaken: 'Alguien ya usa ese nombre. Prueba otro.',
+    day: n => `Día ${n}`, practice: 'Ronda de práctica', startsOn: d => `El juego empieza el ${d}.`,
+    hi: name => `Hola, ${name}.`, yesterdayResults: 'Resultados de ayer',
+    answerPh: 'Tu respuesta', enterAnswer: 'Escribe una respuesta primero',
+    newDay: 'Acaba de empezar un nuevo día. Recarga la página para ver las preguntas nuevas.',
     today: 'Hoy', yesterday: 'Ayer', nobody: 'Nadie jugó ese día.', refresh: 'Actualizar', back: 'Volver',
-    yourScore: 'Tu puntuación', yourRank: 'Tu posición', rankOf: (r, n) => `#${r} de ${n}`, you: 'Tú', pts: 'ptos',
-    played: (n, live) => `Han jugado ${n}${live ? ' hasta ahora · los puntos cambian según juegue más gente' : ''}`,
-    rules: 'Solo tú lo dijiste = 3 puntos · dos personas = 2 · tres o más = 1. Toca una respuesta para ver quién la dijo.',
-    oops: 'Algo salió mal', reload: 'Recargar',
+    rankPts: 'Posición · puntos', played: (n, live) => `Han jugado ${n}${live ? ' hasta ahora · los puntos cambian según juegue más gente' : ''}`,
+    deep: 'RARÍSIMA', pts: 'ptos', oops: 'Algo salió mal', reload: 'Recargar',
   },
 };
 let lang = 'en';
 try { if (localStorage.getItem('lang') === 'es') lang = 'es'; } catch {}
 const t = () => T[lang];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 let redraw = () => home(); // re-renders the current screen after a language switch
 
-const app = document.getElementById('app');
-const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
-const show = html => {
-  document.documentElement.lang = lang;
-  app.innerHTML = `<div class="lang">${[['en', 'English'], ['es', 'Español']].map(([l, name]) =>
-    `<button class="ghost" data-lang="${l}" aria-pressed="${l === lang}">${name}</button>`).join('')}</div>${html}`;
-  app.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => {
-    lang = b.dataset.lang;
-    try { localStorage.setItem('lang', lang); } catch {}
-    redraw();
+// ---------- Day, prompts, and world ----------
+const today = dayKey(TZ);
+const yesterday = dayKey(TZ, new Date(Date.now() - 864e5));
+const n = dayNumber(START, today);
+const worldName = new URLSearchParams(location.search).get('world') ?? SCHEDULE.find(s => today >= s.from && today <= s.to)?.world ?? DEFAULT_WORLD;
+const W = WORLDS[worldName] ?? WORLDS[DEFAULT_WORLD];
+const wt = () => W.text[lang];
+const dateLabel = (key, opts) => new Date(`${key}T12:00:00Z`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', { ...opts, timeZone: 'UTC' });
+
+// ---------- World engine: scenery, camera, and the mover travelling between the 9 points ----------
+const stage = $('stage'), worldEl = $('world'), card = $('card'), sheet = $('sheet');
+let at = 0; // the point the mover is at
+function buildWorld() {
+  const P = W.pts, segs = P.slice(0, -1).map((p, k) => W.seg(p, P[k + 1]));
+  const d = `M${P[0][0]} ${P[0][1]} ${segs.join(' ')}`;
+  worldEl.innerHTML = `<svg viewBox="0 0 400 ${W.height}" xmlns="http://www.w3.org/2000/svg">${W.art(d, lang)}
+    <g id="mover"><g id="orient">${W.mover}</g></g>
+    ${segs.map((s, k) => `<path id="seg${k}" d="M${P[k][0]} ${P[k][1]} ${s}" fill="none"/>`).join('')}</svg>`;
+  stage.style.background = W.bg;
+  $('tint').style.background = `linear-gradient(transparent 20%, ${W.tint})`;
+  $('badge').innerHTML = W.badge;
+  $('flags').classList.toggle('round', !!W.round);
+  placeMover(at);
+}
+function setCam(y, pos) {
+  const s = worldEl.clientWidth / 400, max = W.height * s - stage.clientHeight;
+  worldEl.style.transform = `translateY(${-Math.min(max, Math.max(0, y * s - stage.clientHeight * pos))}px)`;
+}
+function placeMover(k) {
+  at = k;
+  $('mover').style.transform = `translate(${W.pts[k][0]}px,${W.pts[k][1]}px)`;
+  $('hud').textContent = W.hudAt(k);
+  $('tint').style.opacity = (k / 8 * W.tintMax).toFixed(2);
+  if (k === 0) $('orient').style.transform = W.orient(0, 1);
+}
+function travel(k) { // from point k to k + 1
+  return new Promise(done => {
+    const path = $(`seg${k}`), len = path.getTotalLength(), t0 = performance.now(), dur = 1500;
+    const pos0 = k === 0 ? W.homeAt : .36, pos1 = k === 7 ? .12 : .36;
+    $('tint').style.opacity = ((k + 1) / 8 * W.tintMax).toFixed(2);
+    (function frame(now) {
+      const x = Math.min(1, (now - t0) / dur), e = x < .5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2;
+      const p = path.getPointAtLength(len * e), q = path.getPointAtLength(Math.min(len, len * e + 2));
+      $('mover').style.transform = `translate(${p.x}px,${p.y}px)`;
+      if (q.x !== p.x || q.y !== p.y) $('orient').style.transform = W.orient(q.x - p.x, q.y - p.y);
+      setCam(p.y, pos0 + (pos1 - pos0) * e);
+      $('hud').textContent = W.hudMove(k, e);
+      if (x < 1) return requestAnimationFrame(frame);
+      placeMover(k + 1); done();
+    })(t0);
   });
-  scrollTo(0, 0);
-};
-const card = html => `<div class="card">${html}</div>`;
-const fail = msg => show(card(`<h2>${t().oops}</h2><p>${esc(msg)}</p><button onclick="location.reload()">${t().reload}</button>`));
+}
+function flags(done) {
+  $('flags').innerHTML = Array.from({ length: 7 }, (_, i) => `<i style="${i < done ? `background:${W.marker[i % 2]}` : ''}"></i>`).join('');
+}
+if (W.snow) (function snow() {
+  const c = $('snow'), x = c.getContext('2d');
+  let flakes = [];
+  const size = () => { c.width = stage.clientWidth * devicePixelRatio; c.height = stage.clientHeight * devicePixelRatio; flakes = Array.from({ length: 70 }, () => ({ x: Math.random() * c.width, y: Math.random() * c.height, r: (.6 + Math.random() * 1.8) * devicePixelRatio, v: .3 + Math.random() * .9, d: Math.random() * 6 })); };
+  size(); addEventListener('resize', size);
+  (function tick(time) {
+    x.clearRect(0, 0, c.width, c.height); x.fillStyle = 'rgba(255,255,255,.85)';
+    for (const f of flakes) {
+      f.y += f.v * devicePixelRatio; f.x += Math.sin(time / 1400 + f.d) * .4 * devicePixelRatio;
+      if (f.y > c.height) { f.y = -4; f.x = Math.random() * c.width; }
+      x.beginPath(); x.arc(f.x, f.y, f.r, 0, 7); x.fill();
+    }
+    requestAnimationFrame(tick);
+  })(0);
+})();
+
+// ---------- Layout helpers ----------
+function ui({ hero = false, run = false } = {}) {
+  $('hero').classList.toggle('out', !hero);
+  $('heroSub').textContent = `${n < 1 ? t().practice : t().day(n)} · ${dateLabel(today, { weekday: 'short', day: 'numeric', month: 'short' })} · ${wt().place}`;
+  $('top').classList.toggle('run', run);
+  $('lang').innerHTML = [['en', 'EN'], ['es', 'ES']].map(([l, label]) => `<button data-lang="${l}" aria-pressed="${l === lang}">${label}</button>`).join('');
+  $('lang').querySelectorAll('button').forEach(b => b.onclick = () => {
+    lang = b.dataset.lang;
+    document.documentElement.lang = lang;
+    try { localStorage.setItem('lang', lang); } catch {}
+    buildWorld(); redraw();
+  });
+  if (!run) sheet.classList.remove('in');
+}
+const showCard = html => { card.innerHTML = html; requestAnimationFrame(() => card.classList.remove('out')); };
+const hideCard = () => card.classList.add('out');
+const fail = msg => { ui({ hero: true }); showCard(`<div class="q">${t().oops}</div><p class="lead">${esc(msg)}</p><button class="go" onclick="location.reload()">${t().reload}</button>`); };
 
 // Wires the #in input and #ok button. fn returns an error message to show, or nothing.
 function onSubmit(fn, emptyMsg) {
-  const input = document.getElementById('in'), ok = document.getElementById('ok'), err = document.getElementById('err');
-  input.focus();
+  const input = $('in'), ok = $('ok'), err = $('err');
+  setTimeout(() => input.focus({ preventScroll: true }), 400); // plain focus() scrolls the stage while the card slides in
   input.oninput = () => (err.textContent = '');
   const go = async () => {
     const v = input.value.trim();
@@ -115,23 +258,29 @@ function onSubmit(fn, emptyMsg) {
   input.onkeydown = e => { if (e.key === 'Enter') go(); }; // must not return false: that cancels every keypress
 }
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  show(card('<h1>Almost there</h1><p>Add your Supabase URL and key at the top of <code>index.html</code>. The README has the steps.</p>'));
-  throw new Error('Supabase is not configured');
-}
-
+// ---------- Data ----------
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-const today = dayKey(TZ);
-const yesterday = dayKey(TZ, new Date(Date.now() - 864e5));
-const n = dayNumber(START, today);
 const lines = (await (await fetch('prompts.txt', { cache: 'no-cache' })).text()).split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
-if (lines.length < 7) { fail('prompts.txt needs at least 7 prompts.'); throw new Error('Not enough prompts'); }
 const todays = pickPrompts(lines, n);
-const startDate = () => new Date(`${START}T12:00:00Z`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 let me = null; // { id, name }
+
+// ---------- Screens ----------
+function intro(i = 0) {
+  redraw = () => intro(i);
+  ui({ hero: true }); placeMover(0); setCam(W.pts[0][1], W.homeAt);
+  showCard(`<div class="steps">${t().intro.map((_, j) => `<i class="${j <= i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="q">${t().intro[i][0]}</div><p class="lead">${t().intro[i][1]}</p>
+    <button class="go" id="go">${i < 2 ? t().next : t().letsGo}</button>`);
+  $('go').onclick = () => {
+    if (i < 2) return intro(i + 1);
+    try { localStorage.setItem('introSeen', '1'); } catch {}
+    home();
+  };
+}
 
 async function home() {
   redraw = home;
+  ui({ hero: true }); placeMover(0); setCam(W.pts[0][1], W.homeAt);
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     const { data } = await sb.from('players').select('id, name').eq('id', session.user.id).maybeSingle();
@@ -141,18 +290,19 @@ async function home() {
   const { count, error } = await sb.from('answers').select('*', { count: 'exact', head: true }).eq('day', today).eq('player_id', me.id);
   if (error) return fail(error.message);
   if (count >= 7) return results(today);
-  show(card(`<p class="muted">${n < 1 ? t().practice(startDate()) : t().day(n)}</p><h1>${t().todayTitle}</h1>
-    <p>${t().hi(esc(me.name))}</p>
-    <div class="actions"><button id="go">${t().start}</button><button class="ghost" id="yday">${t().yesterdayResults}</button></div>`));
-  document.getElementById('go').onclick = () => ask();
-  document.getElementById('yday').onclick = () => results(yesterday);
+  const practice = n < 1 ? ` ${t().startsOn(dateLabel(START, { day: 'numeric', month: 'long' }))}` : '';
+  showCard(`<div class="eyebrow">${n < 1 ? t().practice : t().day(n)}</div><div class="q">${wt().homeTitle}</div>
+    <p class="lead">${t().hi(esc(me.name))} ${wt().homeLead}${practice}</p>
+    <button class="go" id="go">${wt().start}</button><button class="link" id="yday">${t().yesterdayResults}</button>`);
+  $('go').onclick = async () => { hideCard(); ui({ run: true }); flags(0); await travel(0); ask(0, []); };
+  $('yday').onclick = () => results(yesterday);
 }
 
 function askName() {
   redraw = askName;
-  show(card(`<h1>Famillion</h1><p>${t().tagline}</p>
-    <p class="muted">${t().whoAreYou}</p>
-    <input id="in" maxlength="30" placeholder="${t().namePh}" autocomplete="off"><p class="err" id="err"></p><button id="ok">${t().join}</button>`));
+  ui({ hero: true });
+  showCard(`<div class="q">${t().whoAreYou}</div><p class="lead">${t().nameLead}</p>
+    <input id="in" maxlength="30" placeholder="${t().namePh}" autocomplete="off"><p class="err" id="err"></p><button class="go" id="ok">${t().join}</button>`);
   onSubmit(async name => {
     if (!(await sb.auth.getSession()).data.session) {
       const { error } = await sb.auth.signInAnonymously();
@@ -164,25 +314,29 @@ function askName() {
   }, () => t().enterName);
 }
 
-function ask(i = 0, answers = []) {
+function ask(i, answers) {
   redraw = () => ask(i, answers);
-  show(card(`<div class="dots">${todays.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
-    <p class="muted">${t().promptOf(i + 1)}</p><h2>${esc(promptText(todays[i], lang))}</h2>
+  ui({ run: true }); flags(i);
+  showCard(`<div class="eyebrow">${wt().stop(i + 1)}</div><div class="q">${esc(promptText(todays[i], lang))}</div>
     <input id="in" maxlength="100" placeholder="${t().answerPh}" autocomplete="off"><p class="err" id="err"></p>
-    <button id="ok">${i < 6 ? t().next : t().finish}</button>`));
+    <button class="go" id="ok">${wt().next(i + 1)}</button>`);
   onSubmit(async answer => {
     answers[i] = answer;
-    if (i < 6) return ask(i + 1, answers);
-    // Stores the whole "English | Español" line so results show in each viewer's language.
-    const { error } = await sb.from('answers').insert(answers.map((answer, idx) => ({ day: today, idx, prompt: todays[idx], answer })));
-    if (error?.code === '42501') return t().newDay;
-    if (error && error.code !== '23505') return error.message; // 23505 = already played, show results
-    results(today);
+    if (i === 6) {
+      // Stores the whole "English | Español" line so results show in each viewer's language.
+      const { error } = await sb.from('answers').insert(answers.map((answer, idx) => ({ day: today, idx, prompt: todays[idx], answer })));
+      if (error?.code === '42501') return t().newDay;
+      if (error && error.code !== '23505') return error.message; // 23505 = already played, show results
+    }
+    hideCard(); flags(i + 1);
+    await travel(i + 1);
+    i < 6 ? ask(i + 1, answers) : results(today, true);
   }, () => t().enterAnswer);
 }
 
-async function results(day) {
+async function results(day, arriving = false) {
   redraw = () => results(day);
+  ui(); hideCard(); placeMover(8); setCam(W.pts[8][1], .12); // finish line just above the results sheet
   const { data, error } = await sb.from('answers').select('idx, prompt, answer, players(name)').eq('day', day);
   if (error) return fail(error.message);
   const isToday = day === today;
@@ -190,33 +344,49 @@ async function results(day) {
   const nav = `<div class="actions">${isToday
     ? `<button class="ghost" id="refresh">${t().refresh}</button><button class="ghost" id="yday">${t().yesterdayResults}</button>`
     : `<button class="ghost" id="back">${t().back}</button>`}</div>`;
+  let html;
   if (!data.length) {
-    show(card(`<h2>${label}</h2><p>${t().nobody}</p>${nav}`));
+    html = `<div class="eyebrow">${label}</div><h2>${t().nobody}</h2>${nav}`;
   } else {
     const { prompts, totals } = score(data.map(r => ({ ...r, name: r.players.name })));
     const board = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-    const players = board.length;
     const mine = me && totals[me.name] !== undefined;
     const rank = mine ? board.filter(([, s]) => s > totals[me.name]).length + 1 : null;
-    show(`${mine ? `<div class="stats"><div class="card"><p class="muted">${t().yourScore}</p><b>${totals[me.name]} / 21</b></div>
-      <div class="card"><p class="muted">${t().yourRank}</p><b>${t().rankOf(rank, players)}</b></div></div>` : ''}
-      <div class="card"><p class="muted">${label} · ${t().played(players, isToday)}</p>
-      ${board.map(([name, s], k) => `<div class="row ${me?.name === name ? 'mine' : ''}"><span style="width:20px" class="muted">${k + 1}</span><span class="label">${esc(name)}</span><span class="pts">${s} ${t().pts}</span></div>`).join('')}
-      </div>
-      ${prompts.map((p, k) => p && card(`<p class="muted">${k + 1}. ${esc(promptText(p.text, lang))}</p>${p.groups.map(g => {
-        const isMine = me && g.who.includes(me.name);
-        return `<details><summary class="row ${isMine ? 'mine' : ''}"><span class="label">${esc(g.label)}</span>${isMine ? `<span class="tag">${t().you}</span>` : ''}
-          <span class="bar"><i style="width:${Math.round(g.who.length / players * 100)}%"></i></span><span class="pts">${g.who.length}× · ${points(g.who.length)} ${t().pts}</span></summary>
-          <p class="muted">${esc(g.who.join(', '))}</p></details>`;
-      }).join('')}`)).join('')}
-      ${card(`<p class="muted">${t().rules}</p>${nav}`)}`);
+    html = `<div class="eyebrow">${mine ? wt().finishEyebrow : label}</div><h2>${mine ? wt().finishTitle(rank) : label}</h2>
+      ${mine ? `<div class="stats"><div class="stat"><small>${wt().scoreLabel}</small><b>${W.score(totals[me.name], me.name)}</b></div>
+        <div class="stat"><small>${t().rankPts}</small><b>#${rank} · ${totals[me.name]}</b></div></div>` : ''}
+      <div class="board">${board.map(([name, s], k) => `<div class="row ${me?.name === name ? 'me' : ''}"><span class="r${k + 1}">${k + 1}</span><span class="nm">${esc(name)}</span><span class="t">${W.score(s, name)}</span><span class="pt">${s} ${t().pts}</span></div>`).join('')}</div>
+      <p class="sub">${label} · ${t().played(board.length, isToday)}</p>
+      ${prompts.map((p, k) => p && `<div class="sec"><div class="lab">${wt().stopShort(k + 1)}</div><h3>${esc(promptText(p.text, lang))}</h3><div class="tiles">
+        ${p.groups.map((g, j) => `<div class="tile"><div class="in"><div class="face front">${j + 1}</div>
+          <div class="face back ${me && g.who.includes(me.name) ? 'mine' : ''}"><div class="txt"><div class="a">${esc(g.label)}</div><div class="who">${esc(g.who.join(', '))}</div></div>
+          ${g.who.length === 1 ? `<span class="deep">${t().deep}</span>` : ''}<span class="p">+${points(g.who.length)}</span></div></div></div>`).join('')}
+      </div></div>`).join('')}${nav}`;
   }
-  document.getElementById('refresh')?.addEventListener('click', () => results(today));
-  document.getElementById('yday')?.addEventListener('click', () => results(yesterday));
-  document.getElementById('back')?.addEventListener('click', home);
+  sheet.innerHTML = html;
+  sheet.classList.toggle('anim', arriving);
+  sheet.classList.add('in');
+  sheet.scrollTop = 0;
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.tile').forEach((tile, j) => setTimeout(() => tile.classList.add('flip'), 200 + j * 200));
+    io.unobserve(e.target);
+  }), { root: sheet, threshold: .3 });
+  sheet.querySelectorAll('.sec').forEach(s => io.observe(s));
+  $('refresh')?.addEventListener('click', () => results(today));
+  $('yday')?.addEventListener('click', () => results(yesterday));
+  $('back')?.addEventListener('click', home);
 }
 
-home().catch(e => fail(e.message));
+// ---------- Start ----------
+document.documentElement.lang = lang;
+buildWorld(); setCam(W.pts[0][1], W.homeAt);
+if (lines.length < 7) fail('prompts.txt needs at least 7 prompts.');
+else {
+  let seen = false;
+  try { seen = !!localStorage.getItem('introSeen'); } catch {}
+  (seen ? home() : Promise.resolve(intro())).catch(e => fail(e.message));
+}
 </script>
 </body>
 </html>

@@ -12,6 +12,7 @@ Small differences don't matter: "The Cancún!" and "cancun" count as the same an
 
 - `index.html`: the whole app. A static page, no build step.
 - `game.js`: scoring, answer matching, and which prompts go with which day.
+- `worlds.js`: the worlds a day is played in: the Swiss alpine descent and the Madrid metro. `SCHEDULE` and `DEFAULT_WORLD` in `index.html` pick the world by date. Add `?world=metro` to the URL to preview a world.
 - `prompts.txt`: your prompt list.
 - `schema.sql`: the database. Supabase's free tier hosts it.
 
