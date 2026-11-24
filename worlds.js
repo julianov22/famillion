@@ -77,6 +77,7 @@ const raceTime = (pts, name) => {
 };
 
 const alpine = {
+  start: '2026-12-20', // day 1; prompts come from prompts/alpine.txt
   bg: '#7fb3e0', height: 4000, homeAt: .62, snow: true, tint: '#f7c9a9', tintMax: .45, marker: ['#d52b1e', '#1d4ed8'],
   badge: '<span class="badge swiss"></span>',
   pts: alpinePts,
@@ -89,6 +90,7 @@ const alpine = {
   score: raceTime,
   text: {
     en: {
+      name: 'Swiss Alps', blurb: 'Ski week with the Bosmans',
       place: 'Flumserberg', homeTitle: "Today's run", start: 'Start the run ↓',
       homeLead: '7 gates from Maschgenkamm down to the Walensee. At each gate, one prompt. The rarer your answer, the faster your run.',
       stop: g => `Gate ${g} of 7 · ${fmt(ALTS[g])} m`, stopShort: g => `Gate ${g} · ${fmt(ALTS[g])} m`,
@@ -96,6 +98,7 @@ const alpine = {
       finishEyebrow: 'Finish · Unterterzen · 420 m', finishTitle: r => r === 1 ? 'Fastest run today!' : 'You made it down', scoreLabel: 'Your run',
     },
     es: {
+      name: 'Alpes suizos', blurb: 'Semana de esquí con los Bosman',
       place: 'Flumserberg', homeTitle: 'La bajada de hoy', start: 'Empezar la bajada ↓',
       homeLead: '7 puertas desde Maschgenkamm hasta el Walensee. En cada puerta, una pregunta. Cuanto más rara tu respuesta, más rápida tu bajada.',
       stop: g => `Puerta ${g} de 7 · ${fmt(ALTS[g])} m`, stopShort: g => `Puerta ${g} · ${fmt(ALTS[g])} m`,
@@ -175,6 +178,7 @@ function metroArt(d) {
 }
 
 const metro = {
+  start: '2026-12-30', // day 1; prompts come from prompts/metro.txt
   bg: '#0b1026', height: 4000, homeAt: .62, snow: false, tint: '#ffb86b', tintMax: .18, marker: [CELESTE, CELESTE], round: true,
   badge: '<span class="badge line">1</span>',
   pts: metroPts,
@@ -187,6 +191,7 @@ const metro = {
   score: pts => `23:${String(40 + 21 - pts).padStart(2, '0')}`, // more points, earlier arrival at Sol
   text: {
     en: {
+      name: 'Madrid metro', blurb: "Line 1 to Sol with Julián's family",
       place: 'Madrid', homeTitle: "Today's ride", start: 'Board the train →',
       homeLead: '7 stations on Line 1, from Estrecho to Sol. At each station, one prompt. The rarer your answer, the earlier you arrive.',
       stop: g => `Station ${g} of 7 · ${STATIONS[g]}`, stopShort: g => STATIONS[g],
@@ -194,6 +199,7 @@ const metro = {
       finishEyebrow: 'Sol · Kilómetro 0', finishTitle: r => r === 1 ? 'First to arrive at Sol!' : 'You made it to Sol', scoreLabel: 'Arrival',
     },
     es: {
+      name: 'Metro de Madrid', blurb: 'Línea 1 a Sol con la familia de Julián',
       place: 'Madrid', homeTitle: 'El viaje de hoy', start: 'Subir al tren →',
       homeLead: '7 estaciones de la Línea 1, de Estrecho a Sol. En cada estación, una pregunta. Cuanto más rara tu respuesta, antes llegas.',
       stop: g => `Estación ${g} de 7 · ${STATIONS[g]}`, stopShort: g => STATIONS[g],

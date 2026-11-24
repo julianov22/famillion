@@ -82,6 +82,21 @@ input:focus{border-color:var(--ink)}
 .deep{font:700 10px 'JetBrains Mono';letter-spacing:.06em;color:#fff;background:var(--lake);padding:3px 7px;border-radius:6px;white-space:nowrap}
 .actions{display:flex;gap:8px;margin-top:24px}
 .ghost{flex:1;font:600 15px Inter;padding:12px;border-radius:12px;border:2px solid var(--ice);background:#fff;color:var(--ink);cursor:pointer}
+.wbtn{border:0;font:600 13px Inter;color:var(--ink);cursor:pointer}
+.top.run .wbtn,.top.pick .wbtn{display:none}
+.picker{position:absolute;inset:0;z-index:4;overflow:auto;padding:84px 16px 32px;color:#fff;text-align:center;display:none}
+.picker.in{display:block}
+.picker h1{font:800 56px/.9 'Bricolage Grotesque';letter-spacing:-.045em;margin:0}
+.picker p{font:700 12px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;margin:14px 0 26px;opacity:.75}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wcard{position:relative;aspect-ratio:1;border:0;padding:0;border-radius:20px;overflow:hidden;background:#1b2a45;color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:transform .2s}
+.wcard:active{transform:scale(.97)}
+.wcard .shot{position:absolute;inset:0;width:100%;height:100%}
+.wcard .badge{position:absolute;top:10px;left:10px;margin:0;transform:scale(.6);transform-origin:top left}
+.wcard .lbl{position:absolute;left:0;right:0;bottom:0;padding:30px 12px 11px;background:linear-gradient(transparent,rgba(10,18,34,.88))}
+.wcard b{display:block;font:800 19px/1.05 'Bricolage Grotesque';letter-spacing:-.01em}
+.wcard small{display:block;font-size:12px;line-height:1.3;opacity:.85;margin-top:3px}
+.wcard.add{display:grid;place-items:center;background:none;border:2px dashed rgba(255,255,255,.35);box-shadow:none;color:rgba(255,255,255,.6)}
 </style>
 </head>
 <body>
@@ -89,10 +104,11 @@ input:focus{border-color:var(--ink)}
   <div id="world"></div>
   <div class="tint" id="tint"></div>
   <canvas id="snow"></canvas>
-  <div class="top" id="top"><span class="pill brandpill"><span class="brand">Famillion</span><span class="flags" id="flags"></span></span><span class="lang" id="lang"></span><span class="hud" id="hud"></span></div>
+  <div class="top" id="top"><span class="pill brandpill"><span class="brand">Famillion</span><span class="flags" id="flags"></span></span><button class="pill wbtn" id="worlds"></button><span class="lang" id="lang"></span><span class="hud" id="hud"></span></div>
   <div class="hero out" id="hero"><span id="badge"></span><h1>Famillion</h1><p id="heroSub"></p></div>
   <div class="card out" id="card"></div>
   <div class="sheet" id="sheet"></div>
+  <div class="picker" id="picker"></div>
 </div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
@@ -103,11 +119,8 @@ const { WORLDS } = await import(`./worlds.js?v=${Date.now()}`);
 // Settings. The key is Supabase's public anon/publishable key, safe to expose (RLS protects the data).
 const SUPABASE_URL = 'https://skbzynccpjjltrweyjcr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_TC2DTPoGru0qaKWiqyyNkw_7X0HXQTh';
-const START = '2026-12-20';     // Day 1. Days before it are practice rounds.
 const TZ = 'Europe/Amsterdam';  // Keep in sync with family_today() in schema.sql
-// Which world each day is played in. ?world=metro in the URL overrides it, for previewing.
-const DEFAULT_WORLD = 'alpine';
-const SCHEDULE = [{ from: '2026-12-30', to: '2027-01-06', world: 'metro' }];
+// Each world's day 1 is its `start` in worlds.js. ?world=metro in the URL skips the picker.
 
 const T = {
   en: {
@@ -116,6 +129,7 @@ const T = {
       ['Rare answers win', 'Only you said it: 3 points. Two people: 2. Three or more: 1. Think of what only you would remember.'],
       ['Then compare', 'You can play once a day. Afterwards you see everyone\'s answers and who said what.'],
     ],
+    pickWorld: 'Pick a world', worlds: '‹ Worlds', addWorld: 'Add a world',
     next: 'Next', letsGo: "Let's go",
     whoAreYou: 'First, your name', nameLead: 'Everyone sees it on the leaderboard. Play from this phone every day.',
     namePh: 'Your name', join: 'Join', enterName: 'Enter your name first', nameTaken: 'Someone already uses that name. Try another.',
@@ -133,6 +147,7 @@ const T = {
       ['Gana lo raro', 'Solo tú lo dijiste: 3 puntos. Dos personas: 2. Tres o más: 1. Piensa en lo que solo tú recordarías.'],
       ['Y luego, a comparar', 'Puedes jugar una vez al día. Después ves las respuestas de todos y quién dijo qué.'],
     ],
+    pickWorld: 'Elige un mundo', worlds: '‹ Mundos', addWorld: 'Añadir un mundo',
     next: 'Siguiente', letsGo: '¡Vamos!',
     whoAreYou: 'Primero, tu nombre', nameLead: 'Todos lo verán en la clasificación. Juega cada día desde este móvil.',
     namePh: 'Tu nombre', join: 'Entrar', enterName: 'Escribe tu nombre primero', nameTaken: 'Alguien ya usa ese nombre. Prueba otro.',
@@ -150,15 +165,14 @@ try { if (localStorage.getItem('lang') === 'es') lang = 'es'; } catch {}
 const t = () => T[lang];
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
-let redraw = () => home(); // re-renders the current screen after a language switch
+let redraw = () => picker(); // re-renders the current screen after a language switch
 
 // ---------- Day, prompts, and world ----------
 const today = dayKey(TZ);
 const yesterday = dayKey(TZ, new Date(Date.now() - 864e5));
-const n = dayNumber(START, today);
-const worldName = new URLSearchParams(location.search).get('world') ?? SCHEDULE.find(s => today >= s.from && today <= s.to)?.world ?? DEFAULT_WORLD;
-const W = WORLDS[worldName] ?? WORLDS[DEFAULT_WORLD];
+let key, W, n, todays; // the chosen world, its day number, and today's 7 prompts in it
 const wt = () => W.text[lang];
+const route = w => `M${w.pts[0][0]} ${w.pts[0][1]} ${w.pts.slice(0, -1).map((p, k) => w.seg(p, w.pts[k + 1])).join(' ')}`;
 const dateLabel = (key, opts) => new Date(`${key}T12:00:00Z`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', { ...opts, timeZone: 'UTC' });
 
 // ---------- World engine: scenery, camera, and the mover travelling between the 9 points ----------
@@ -166,8 +180,7 @@ const stage = $('stage'), worldEl = $('world'), card = $('card'), sheet = $('she
 let at = 0; // the point the mover is at
 function buildWorld() {
   const P = W.pts, segs = P.slice(0, -1).map((p, k) => W.seg(p, P[k + 1]));
-  const d = `M${P[0][0]} ${P[0][1]} ${segs.join(' ')}`;
-  worldEl.innerHTML = `<svg viewBox="0 0 400 ${W.height}" xmlns="http://www.w3.org/2000/svg">${W.art(d, lang)}
+  worldEl.innerHTML = `<svg viewBox="0 0 400 ${W.height}" xmlns="http://www.w3.org/2000/svg">${W.art(route(W), lang)}
     <g id="mover"><g id="orient">${W.mover}</g></g>
     ${segs.map((s, k) => `<path id="seg${k}" d="M${P[k][0]} ${P[k][1]} ${s}" fill="none"/>`).join('')}</svg>`;
   stage.style.background = W.bg;
@@ -207,14 +220,14 @@ function travel(k) { // from point k to k + 1
 function flags(done) {
   $('flags').innerHTML = Array.from({ length: 7 }, (_, i) => `<i style="${i < done ? `background:${W.marker[i % 2]}` : ''}"></i>`).join('');
 }
-if (W.snow) (function snow() {
+(function snow() {
   const c = $('snow'), x = c.getContext('2d');
   let flakes = [];
   const size = () => { c.width = stage.clientWidth * devicePixelRatio; c.height = stage.clientHeight * devicePixelRatio; flakes = Array.from({ length: 70 }, () => ({ x: Math.random() * c.width, y: Math.random() * c.height, r: (.6 + Math.random() * 1.8) * devicePixelRatio, v: .3 + Math.random() * .9, d: Math.random() * 6 })); };
   size(); addEventListener('resize', size);
   (function tick(time) {
     x.clearRect(0, 0, c.width, c.height); x.fillStyle = 'rgba(255,255,255,.85)';
-    for (const f of flakes) {
+    if (W?.snow) for (const f of flakes) {
       f.y += f.v * devicePixelRatio; f.x += Math.sin(time / 1400 + f.d) * .4 * devicePixelRatio;
       if (f.y > c.height) { f.y = -4; f.x = Math.random() * c.width; }
       x.beginPath(); x.arc(f.x, f.y, f.r, 0, 7); x.fill();
@@ -224,16 +237,21 @@ if (W.snow) (function snow() {
 })();
 
 // ---------- Layout helpers ----------
-function ui({ hero = false, run = false } = {}) {
+function ui({ hero = false, run = false, pick = false } = {}) {
   $('hero').classList.toggle('out', !hero);
-  $('heroSub').textContent = `${n < 1 ? t().practice : t().day(n)} · ${dateLabel(today, { weekday: 'short', day: 'numeric', month: 'short' })} · ${wt().place}`;
+  if (W) $('heroSub').textContent = `${n < 1 ? t().practice : t().day(n)} · ${dateLabel(today, { weekday: 'short', day: 'numeric', month: 'short' })} · ${wt().place}`;
   $('top').classList.toggle('run', run);
+  $('top').classList.toggle('pick', pick);
+  $('picker').classList.toggle('in', pick);
+  $('worlds').textContent = t().worlds;
+  $('worlds').onclick = picker;
   $('lang').innerHTML = [['en', 'EN'], ['es', 'ES']].map(([l, label]) => `<button data-lang="${l}" aria-pressed="${l === lang}">${label}</button>`).join('');
   $('lang').querySelectorAll('button').forEach(b => b.onclick = () => {
     lang = b.dataset.lang;
     document.documentElement.lang = lang;
     try { localStorage.setItem('lang', lang); } catch {}
-    buildWorld(); redraw();
+    if (W) buildWorld();
+    redraw();
   });
   if (!run) sheet.classList.remove('in');
 }
@@ -260,11 +278,38 @@ function onSubmit(fn, emptyMsg) {
 
 // ---------- Data ----------
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-const lines = (await (await fetch('prompts.txt', { cache: 'no-cache' })).text()).split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
-const todays = pickPrompts(lines, n);
 let me = null; // { id, name }
 
 // ---------- Screens ----------
+function picker() {
+  redraw = picker;
+  key = W = null; worldEl.innerHTML = ''; stage.style.background = '#0f1d33'; $('tint').style.opacity = 0;
+  hideCard(); ui({ pick: true });
+  const shot = w => { // the world's first screen, shrunk into a square
+    const [x, y] = w.pts[0];
+    return `<svg class="shot" viewBox="0 ${y - 210} 400 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${w.art(route(w), lang)}
+      <g style="transform:translate(${x}px,${y}px)"><g style="transform:${w.orient(0, 1)}">${w.mover}</g></g></svg>`;
+  };
+  $('picker').innerHTML = `<h1>Famillion</h1><p>${t().pickWorld}</p><div class="grid">
+    ${Object.entries(WORLDS).map(([k, w]) => `<button class="wcard" data-world="${k}">${shot(w)}${w.badge}
+      <span class="lbl"><b>${w.text[lang].name}</b><small>${w.text[lang].blurb}</small></span></button>`).join('')}
+    <button class="wcard add" aria-label="${t().addWorld}" title="${t().addWorld}"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>`; // ponytail: the + card does nothing yet; adding worlds comes later
+  $('picker').querySelectorAll('[data-world]').forEach(b => b.onclick = () => enter(b.dataset.world).catch(e => fail(e.message)));
+}
+
+async function enter(k) {
+  key = k; W = WORLDS[k]; n = dayNumber(W.start, today);
+  $('picker').innerHTML = ''; // its art shares gradient ids with the world's
+  ui(); buildWorld(); placeMover(0); setCam(W.pts[0][1], W.homeAt);
+  const lines = (await (await fetch(`prompts/${k}.txt`, { cache: 'no-cache' })).text()).split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#'));
+  if (lines.length < 7) return fail(`prompts/${k}.txt needs at least 7 prompts.`);
+  todays = pickPrompts(lines, n);
+  let seen = false;
+  try { seen = !!localStorage.getItem('introSeen'); } catch {}
+  return seen ? home() : intro();
+}
+
 function intro(i = 0) {
   redraw = () => intro(i);
   ui({ hero: true }); placeMover(0); setCam(W.pts[0][1], W.homeAt);
@@ -287,10 +332,10 @@ async function home() {
     me = data;
   }
   if (!me) return askName();
-  const { count, error } = await sb.from('answers').select('*', { count: 'exact', head: true }).eq('day', today).eq('player_id', me.id);
+  const { count, error } = await sb.from('answers').select('*', { count: 'exact', head: true }).eq('day', today).eq('world', key).eq('player_id', me.id);
   if (error) return fail(error.message);
   if (count >= 7) return results(today);
-  const practice = n < 1 ? ` ${t().startsOn(dateLabel(START, { day: 'numeric', month: 'long' }))}` : '';
+  const practice = n < 1 ? ` ${t().startsOn(dateLabel(W.start, { day: 'numeric', month: 'long' }))}` : '';
   showCard(`<div class="eyebrow">${n < 1 ? t().practice : t().day(n)}</div><div class="q">${wt().homeTitle}</div>
     <p class="lead">${t().hi(esc(me.name))} ${wt().homeLead}${practice}</p>
     <button class="go" id="go">${wt().start}</button><button class="link" id="yday">${t().yesterdayResults}</button>`);
@@ -324,7 +369,7 @@ function ask(i, answers) {
     answers[i] = answer;
     if (i === 6) {
       // Stores the whole "English | Español" line so results show in each viewer's language.
-      const { error } = await sb.from('answers').insert(answers.map((answer, idx) => ({ day: today, idx, prompt: todays[idx], answer })));
+      const { error } = await sb.from('answers').insert(answers.map((answer, idx) => ({ day: today, world: key, idx, prompt: todays[idx], answer })));
       if (error?.code === '42501') return t().newDay;
       if (error && error.code !== '23505') return error.message; // 23505 = already played, show results
     }
@@ -337,7 +382,7 @@ function ask(i, answers) {
 async function results(day, arriving = false) {
   redraw = () => results(day);
   ui(); hideCard(); placeMover(8); setCam(W.pts[8][1], .12); // finish line just above the results sheet
-  const { data, error } = await sb.from('answers').select('idx, prompt, answer, players(name)').eq('day', day);
+  const { data, error } = await sb.from('answers').select('idx, prompt, answer, players(name)').eq('day', day).eq('world', key);
   if (error) return fail(error.message);
   const isToday = day === today;
   const label = isToday ? t().today : day === yesterday ? t().yesterday : day;
@@ -380,13 +425,8 @@ async function results(day, arriving = false) {
 
 // ---------- Start ----------
 document.documentElement.lang = lang;
-buildWorld(); setCam(W.pts[0][1], W.homeAt);
-if (lines.length < 7) fail('prompts.txt needs at least 7 prompts.');
-else {
-  let seen = false;
-  try { seen = !!localStorage.getItem('introSeen'); } catch {}
-  (seen ? home() : Promise.resolve(intro())).catch(e => fail(e.message));
-}
+const linked = new URLSearchParams(location.search).get('world');
+WORLDS[linked] ? enter(linked).catch(e => fail(e.message)) : picker();
 </script>
 </body>
 </html>

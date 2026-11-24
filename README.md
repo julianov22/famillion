@@ -12,8 +12,8 @@ Small differences don't matter: "The Cancún!" and "cancun" count as the same an
 
 - `index.html`: the whole app. A static page, no build step.
 - `game.js`: scoring, answer matching, and which prompts go with which day.
-- `worlds.js`: the worlds a day is played in: the Swiss alpine descent and the Madrid metro. `SCHEDULE` and `DEFAULT_WORLD` in `index.html` pick the world by date. Add `?world=metro` to the URL to preview a world.
-- `prompts.txt`: your prompt list.
+- `worlds.js`: the worlds you can play in: the Swiss Alps and the Madrid metro. Players pick one on the first screen. Each world has its own start date (`start`), and a link ending in `?world=metro` skips the picker.
+- `prompts/`: one prompt list per world, like `prompts/alpine.txt`. Each world is scored on its own.
 - `schema.sql`: the database. Supabase's free tier hosts it.
 
 Players join by typing their name. There are no passwords or emails: Supabase gives each device an anonymous account and remembers it. Each person should play from the same device every day.
@@ -27,8 +27,8 @@ Players join by typing their name. There are no passwords or emails: Supabase gi
    - `SUPABASE_KEY`: the publishable key from **Project Settings → API Keys**. It starts with `sb_publishable_`. The legacy `anon` key also works. Never use the secret key.
 
    The publishable key is meant to be public; the database rules in `schema.sql` protect the data. The green **Connect** button at the top of the dashboard shows both values too.
-4. **Set the start date and timezone.** In `index.html`, `START` is day 1 and `TZ` is the family's timezone. Days before `START` are practice rounds, for testing. If you change `TZ`, change it in `family_today()` in `schema.sql` too.
-5. **Write your prompts** in `prompts.txt`, one per line, as `English | Español`. Players switch languages at the top of the page. Add new prompts at the bottom only.
+4. **Set the start dates and timezone.** Each world's `start` in `worlds.js` is its day 1. Days before it are practice rounds, for testing. `TZ` in `index.html` is the family's timezone. If you change `TZ`, change it in `family_today()` in `schema.sql` too.
+5. **Write your prompts** in `prompts/<world>.txt`, one per line, as `English | Español`. Players switch languages at the top of the page. Add new prompts at the bottom only.
 6. **Publish it.** On GitHub go to **Settings → Pages**, choose **Deploy from a branch**, then `main` and `/ (root)`. The game goes live at `https://julianov22.github.io/famillion/`. Send that link to the family.
 
 ## Being the referee
